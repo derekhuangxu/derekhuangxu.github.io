@@ -3,11 +3,11 @@
 ## Source: https://github.com/hexojs/hexo/
 
 # Site
-title: Hexo
+title: 老黄的杂货铺
 subtitle:
-description:
-author: John Doe
-language:
+description: 日常生活、代码杂记、生活琐碎、数码日常
+author: Derek Huang
+language: Chinese
 timezone:
 
 # URL
@@ -63,7 +63,7 @@ pagination_dir: page
 # Extensions
 ## Plugins: http://hexo.io/plugins/
 ## Themes: http://hexo.io/themes/
-theme: landscape
+theme: maupassant
 
 # Deployment
 ## Docs: http://hexo.io/docs/deployment.html
