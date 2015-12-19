@@ -73,3 +73,10 @@ deploy:
   repo: https://github.com/derekhuangxu/derekhuangxu.github.io
   branch: 
   message: 
+
+# Social links
+social:
+  github: https://github.com/derekhuangxu
+  twitter: https://twitter.com/huangwade3
+  zhihu: http://www.zhihu.com/people/huang-xu-15
+  # 等等
