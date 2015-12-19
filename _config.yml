@@ -4,16 +4,17 @@
 
 # Site
 title: 老黄的杂货铺
-subtitle: 5555555
+subtitle:
 description: 日常生活、代码杂记、生活琐碎、数码日常
-author: DerekHuang
-language: zh-Hans
-timezone: Japan
+avatar: http://ww1.sinaimg.cn/large/7422c6f7jw1ez54n959nhj21kw2dw1ky.jpg
+author: derekhuang
+language: 
+timezone:
 
 # URL
 ## If your site is put in a subdirectory, set url as 'http://yoursite.com/child' and root as '/child/'
-url: http://derekhuangxu.github.io
-root: 
+url: http://yoursite.com
+root: /
 permalink: :year/:month/:day/:title/
 permalink_defaults:
 
