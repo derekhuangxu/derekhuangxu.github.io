@@ -230,7 +230,117 @@
         
           <span itemprop="articleBody">
             
-              
+              <blockquote>
+<p>因为公司最近在开发新的版本，新的版本里面需要集成支付功能，所以就开始了以下的故事。。。</p>
+</blockquote>
+<p>##1、创建应用<br>这个其实开发者们都应该懂，就是在支付宝这里挂个号，然后进行下一步业务的申请。</p>
+<p><a href="https://openhome.alipay.com/platform/createApp.htm" target="_blank" rel="external">创建应用的链接</a></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/711112-0db5991ba93c5280.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="创建应用界面"></p>
+<p><strong><em>开发者只需要按照指示一步一步添加内容就可以。</em></strong></p>
+<p>##2、申请移动支付<br>这个就需要一些公司文档什么的了，根据指示填写即可，但是要切记不要让自己的word超过了大小限制，否则有一定几率不会通过。<br><a href="https://b.alipay.com/order/productDetail.htm?productId=2015110218010538" target="_blank" rel="external">签约成为商家</a><br><img src="http://upload-images.jianshu.io/upload_images/711112-5b75941ae4f0a37b.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<blockquote>
+<p>虽然说，整个流程可能需要将近两周时间，但是根据我这次集成来看，大约一周多就能完成。但是假如你的开发周期比较紧张，建议早申请，毕竟要控制时间成本。</p>
+</blockquote>
+<p>##3、下载官方Demo<br>这个是比较坑的事情。。。不知道是不是公司原来办公室网络的问题，总之就是用迅雷无论如何也下载不下来，然后用了<strong>chrome</strong>之后就一切顺利。</p>
+<p><a href="http://doc.open.alipay.com/doc2/detail?treeId=54&amp;articleId=103419&amp;docType=1" target="_blank" rel="external">开发工具包下载</a></p>
+<p>点击以上链接之后进入各种Demo的下载页面，当然，也可以下载用于UI的视觉资源。（PS:<strong>Android和iOS的Demo是在一起的</strong>）</p>
+<p>####以下两张图片为下载的Demo的文件情况：<br><img src="http://upload-images.jianshu.io/upload_images/711112-be75b0b1e3f6bfda.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Demo内部文件"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/711112-d5134d7115cb196d.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Demo内部文件"></p>
+<p>因为我是做iOS端的集成，所以自行忽略掉了服务端和Android端的Demo。</p>
+<p>##4、业务逻辑<br><a href="http://doc.open.alipay.com/doc2/detail?spm=0.0.0.0.w6njr9&amp;treeId=59&amp;articleId=103658&amp;docType=1" target="_blank" rel="external">交互流程网页链接</a></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/711112-a22113fe90aa974e.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="功能流程"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/711112-4c7cf01cbbc683a3.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="数据交互"></p>
+<p>支付宝支付的功能流程相比较微信支付来说简单的很，如上面两张图展示的，我们的App（也就是商户客户端）所做的大概只有三个步骤：</p>
+<ul>
+<li>生成订单</li>
+<li>调用支付宝接口，发送订单</li>
+<li>返回订单支付结果并处理</li>
+</ul>
+<p>功能层面上讲就是着这些，但是支付环节肯定有一个安全性问题，那么就需要加密以及解密的过程。</p>
+<blockquote>
+<p>目前支付宝采取的是<strong>RSA</strong>的加密方式，这是一种比较常见的非对称加密算法，至于怎么集成，下面会给大家做个详细介绍。<a href="https://zh.wikipedia.org/wiki/RSA加密演算法" target="_blank" rel="external"><strong>RSA维基</strong></a></p>
+</blockquote>
+<p>##5、集成<br><img src="http://upload-images.jianshu.io/upload_images/711112-f4cc1abff9952185.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="iOS工程内容"></p>
+<p>###1）添加framework和其他文件<br>打开iOS工程，你会看到上面的一堆东西，你需要复制粘贴到自己工程里的有：</p>
+<ul>
+<li>lipaySDK.framework</li>
+<li>AlipaySDK.bundle</li>
+<li>Order.h和Order.m</li>
+<li>Until文件夹</li>
+<li>openssl文件夹</li>
+<li>libcrypto.a和libssl.a</li>
+</ul>
+<p>###2）添加第三方框架和类库<br><img src="http://upload-images.jianshu.io/upload_images/711112-a2b76b9d600ed23a.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="来源于网络，侵删"><br>以及上面的<code>libcrypto.a , libssl.a</code>。</p>
+<p>此时，假如你启动工程，很大几率上你会发现报<strong>error</strong>的情况。<br>报错<code>#include &lt;openssl/opensslconf.h&gt; not find</code><br>这是一个神奇的大坑，我Google了好久，也不得其解，然后经网友提醒之后想起来<code>#import &quot;&quot;</code>和<code>#import &lt;&gt;</code>的区别。</p>
+<blockquote>
+<p>解决方法：Targets -&gt; Build Settings 下的 Header Search Paths。添加如下目录 “$(SRCROOT)/项目名称/文件的绝对地址”</p>
+</blockquote>
+<p>在集成之前，不要忘了还要写一个<strong>URL Scheme</strong>，在Targets -&gt; Info 下最后一个即可找到。<br><img src="http://upload-images.jianshu.io/upload_images/711112-2c66ba86454db581.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<p>###3)集成代码<br>你在添加代码的时候会发现下图所示代码<br><img src="http://upload-images.jianshu.io/upload_images/711112-7fb3eff2b60359e5.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt=""></p>
+<ul>
+<li>partner：可以在支付宝的账户中找到</li>
+<li>seller：就是我们的支付宝账号</li>
+<li>privateKey：这个就是我们上面提到的<strong>RSA</strong>加密中的<strong>密钥</strong>。</li>
+</ul>
+<p>密钥生成方法在上文中可以看到，就是在上文中的下载的官方文档中openssl文件夹中的生成命令。</p>
+<p><a href="http://doc.open.alipay.com/doc2/detail?treeId=58&amp;articleId=103242&amp;docType=1" target="_blank" rel="external">RSA私钥及公钥生成</a><br><img src="http://upload-images.jianshu.io/upload_images/711112-24e81c89fabb1ce9.jpg?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="网页截图"></p>
+<blockquote>
+<p>注意：我在生成密钥的时候，在第三行，误将其以为是JAVA开发者才会使用，所以没有在命令行中输入命令，一直导致<strong>无法加密</strong>，所以iOS开发者务必将所有命令输入Vim当中。</p>
+</blockquote>
+<p>生成的文件一共有两个<code>rsa_private_key.pem</code>和<code>rsa_public_key.pem</code>，第一个就是私钥，可以用vim打开，也可以用文本文件打开，打开之后复制到工程中即可，值得注意的是，复制的时候<strong>不要有空格</strong>等东西。。。</p>
+<p>#####上传公钥：<br><a href="http://doc.open.alipay.com/doc2/detail.htm?spm=0.0.0.0.M3ZhPy&amp;treeId=58&amp;articleId=103578&amp;docType=1" target="_blank" rel="external">上传公钥官方指导</a>，和私钥一样，上传的过程中，<strong>切记不要有空格</strong>等字符出现。</p>
+<p>####AppDelegate</p>
+<pre><code>- (BOOL)application:(UIApplication *)application
+            openURL:(NSURL *)url
+  sourceApplication:(NSString *)sourceApplication
+         annotation:(id)annotation {
+
+ //跳转支付宝钱包进行支付，处理支付结果
+  [[AlipaySDK defaultService] processOrderWithPaymentResult:url standbyCallback:^(NSDictionary *resultDic) {
+                NSLog(@&quot;result = %@&quot;,resultDic);
+    }];
+
+return YES;
+</code></pre><p>}</p>
+<p>####执行回调    </p>
+<pre><code>orderString = [NSString stringWithFormat:@&quot;%@&amp;sign=\&quot;%@\&quot;&amp;sign_type=\&quot;%@\&quot;&quot;,
+               orderSpec, signedString, @&quot;RSA&quot;];
+
+[[AlipaySDK defaultService] payOrder:orderString fromScheme:appScheme callback:^(NSDictionary *resultDic) {
+    NSLog(@&quot;reslut = %@&quot;,resultDic);
+}];
+</code></pre><p>以下是几个回调返回的resultDic值：</p>
+<pre><code>9000 订单支付成功 
+8000 正在处理中  
+4000 订单支付失败 
+6001 用户中途取消 
+6002 网络连接出错       
+</code></pre><p>####对于iOS9进行适配<br>和其他的第三SDK一样，对于新的iOS9，支付宝SDK一样需要下<code>infoPlist</code>进行适配。</p>
+<pre><code>&lt;key&gt;NSAppTransportSecurity&lt;/key&gt;
+   &lt;dict&gt;
+           &lt;key&gt;NSExceptionDomains&lt;/key&gt;
+           &lt;dict&gt;
+              &lt;key&gt;alipay.com&lt;/key&gt;
+          &lt;dict&gt;
+&lt;!--Include to allow subdomains--&gt; &lt;key&gt;NSIncludesSubdomains&lt;/key&gt;
+&lt;true/&gt;
+&lt;!--Include to allow insecure HTTP requests--&gt;     &lt;key&gt;NSTemporaryExceptionAllowsInsecureHTTPLoads&lt;/key&gt; &lt;true/&gt;
+         &lt;!--Include to specify minimum TLS version--&gt;
+         &lt;key&gt;NSTemporaryExceptionMinimumTLSVersion&lt;/key&gt;
+         &lt;string&gt;TLSv1.1&lt;/string&gt;
+      &lt;/dict&gt;
+   &lt;/dict&gt;
+&lt;/dict&gt;
+</code></pre><p>###4）易发bug以及总结<br>我觉得最易发的有：</p>
+<ul>
+<li>报错<code>#include &lt;openssl/opensslconf.h&gt; not find</code></li>
+<li>返回错误ALI64和ALI69</li>
+</ul>
+<p>第一个上面有提到，第二个可以在支付包官方文档中找到：<a href="http://doc.open.alipay.com/doc2/detail.htm?spm=a219a.7386797.0.0.ega2nl&amp;treeId=70&amp;articleId=103617&amp;docType=1" target="_blank" rel="external">官方链接</a>。<br>理论上讲，最大概率出错就是在公钥和密钥的处理上，认真排查应该就会找到问题。<br>如果还没有解决，可以<a href="http://doc.open.alipay.com/doc2/detail?treeId=70&amp;articleId=103646&amp;docType=1" target="_blank" rel="external">寻找客服</a>来解决问题，刚开始的是<strong>智能机器人客服</strong>，如果两次都无法解决问题，还可以后面申请人工客服，只不过等待时间可能会有点长。</p>
+<blockquote>
+<p>支付宝的集成还是相对来说相当简单的，只要认真查验官方文档以及认真Google，相信会找到自己想要的解决方发。这篇文章较为匆忙，如有问题还请各位指正。</p>
+</blockquote>
+
             
           </span>
         
